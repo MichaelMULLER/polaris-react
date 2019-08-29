@@ -28,7 +28,7 @@ export {Caption, CaptionProps} from './Caption';
 
 export {Card, CardProps} from './Card';
 
-export {Checkbox, CheckboxProps} from './Checkbox';
+export {Checkbox, CheckboxProps, CheckboxHandles} from './Checkbox';
 
 export {ChoiceList, ChoiceListProps} from './ChoiceList';
 

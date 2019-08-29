@@ -24,6 +24,7 @@ Use [the changelog guidelines](https://git.io/polaris-changelog-guidelines) to f
 - Added default accessibility label from `ResourceItem` ([#2097](https://github.com/Shopify/polaris-react/pull/2097))
 - Reverted `Page.primaryAction` forcing `primary` to be `true` ([#2137](https://github.com/Shopify/polaris-react/pull/2137))
 - Removed `React.Children.only` from `AppProvider`and `ThemeProvider` ([#2121](https://github.com/Shopify/polaris-react/pull/2121))
+- Fixed accessibility issue with `BulkActions` checkbox losing forcus ([#2138](https://github.com/Shopify/polaris-react/pull/2138))
 
 ### Documentation
 
@@ -40,5 +41,6 @@ Use [the changelog guidelines](https://git.io/polaris-changelog-guidelines) to f
 - Migrated `ContextualSaveBar` to use hooks instead of `withAppProvider` ([#2091](https://github.com/Shopify/polaris-react/pull/2091))
 - Migrated `RangeSlider`, `ScrollLock` and `TopBar.SearchField` to use hooks instead of withAppProvider ([#2083](https://github.com/Shopify/polaris-react/pull/2083))
 - Updated `ResourceItem` to no longer rely on withAppProvider ([#2094](https://github.com/Shopify/polaris-react/pull/2094))
+- Converted `Checkbox` to use hooks and allow for a focus handler ([#2138](https://github.com/Shopify/polaris-react/pull/2138))
 
 ### Deprecations
