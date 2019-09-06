@@ -43,6 +43,8 @@ Use [the changelog guidelines](https://git.io/polaris-changelog-guidelines) to f
 
 - Removed mocks in various tests suites that are now redundant ([#1978](https://github.com/Shopify/polaris-react/pull/1978))
 
+- Update `Day` and `DatePicker` to use hooks ([#2089](https://github.com/Shopify/polaris-react/pull/2089))
+
 ### Deprecations
 
 - Deprecated `FilterControl`. Use `Filters` instead ([#1774](https://github.com/Shopify/polaris-react/pull/1774))
