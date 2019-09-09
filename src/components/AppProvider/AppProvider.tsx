@@ -23,9 +23,7 @@ import {
 } from '../../utilities/unique-id';
 
 interface State {
-  intl: I18n;
   appBridge: ReturnType<typeof createAppBridge>;
-  link: LinkLikeComponent | undefined;
 }
 
 export interface AppProviderProps extends AppBridgeOptions {
@@ -48,12 +46,10 @@ export class AppProvider extends React.Component<AppProviderProps, State> {
     this.scrollLockManager = new ScrollLockManager();
     this.uniqueIdFactory = new UniqueIdFactory(globalIdGeneratorFactory);
 
-    const {i18n, apiKey, shopOrigin, forceRedirect, linkComponent} = this.props;
+    const {apiKey, shopOrigin, forceRedirect} = this.props;
 
     // eslint-disable-next-line react/state-in-constructor
     this.state = {
-      link: linkComponent,
-      intl: new I18n(i18n),
       appBridge: createAppBridge({shopOrigin, apiKey, forceRedirect}),
     };
   }
@@ -65,17 +61,13 @@ export class AppProvider extends React.Component<AppProviderProps, State> {
   }
 
   componentDidUpdate({
-    i18n: prevI18n,
-    linkComponent: prevLinkComponent,
     apiKey: prevApiKey,
     shopOrigin: prevShopOrigin,
     forceRedirect: prevForceRedirect,
   }: AppProviderProps) {
-    const {i18n, linkComponent, apiKey, shopOrigin, forceRedirect} = this.props;
+    const {apiKey, shopOrigin, forceRedirect} = this.props;
 
     if (
-      i18n === prevI18n &&
-      linkComponent === prevLinkComponent &&
       apiKey === prevApiKey &&
       shopOrigin === prevShopOrigin &&
       forceRedirect === prevForceRedirect
@@ -85,23 +77,21 @@ export class AppProvider extends React.Component<AppProviderProps, State> {
 
     // eslint-disable-next-line react/no-did-update-set-state
     this.setState({
-      link: linkComponent,
-      intl: new I18n(i18n),
       appBridge: createAppBridge({shopOrigin, apiKey, forceRedirect}),
     });
   }
 
   render() {
-    const {theme = {logo: null}, children} = this.props;
-    const {intl, appBridge, link} = this.state;
+    const {i18n, linkComponent, theme = {logo: null}, children} = this.props;
+    const {appBridge} = this.state;
 
     return (
-      <I18nContext.Provider value={intl}>
+      <I18nContext.Provider value={new I18n(i18n)}>
         <ScrollLockManagerContext.Provider value={this.scrollLockManager}>
           <StickyManagerContext.Provider value={this.stickyManager}>
             <UniqueIdFactoryContext.Provider value={this.uniqueIdFactory}>
               <AppBridgeContext.Provider value={appBridge}>
-                <LinkContext.Provider value={link}>
+                <LinkContext.Provider value={linkComponent}>
                   <ThemeProvider theme={theme}>
                     {React.Children.only(children)}
                   </ThemeProvider>
