@@ -1,4 +1,10 @@
-import React from 'react';
+import React, {
+  ReactElement,
+  ReactPortal,
+  useState,
+  useRef,
+  useEffect,
+} from 'react';
 import {Theme} from '../../utilities/theme';
 import {ThemeProvider} from '../ThemeProvider';
 import {I18n, I18nContext, TranslationDictionary} from '../../utilities/i18n';
@@ -22,9 +28,9 @@ import {
   globalIdGeneratorFactory,
 } from '../../utilities/unique-id';
 
-interface State {
-  appBridge: ReturnType<typeof createAppBridge>;
-}
+type OnlyChild = ReactElement | ReactFragment | ReactPortal;
+interface ReactNodeArray extends Array<OnlyChild> {}
+type ReactFragment = ReactNodeArray;
 
 export interface AppProviderProps extends AppBridgeOptions {
   /** A locale object or array of locale objects that overrides default translations */
@@ -33,74 +39,54 @@ export interface AppProviderProps extends AppBridgeOptions {
   linkComponent?: LinkLikeComponent;
   /** Custom logos and colors provided to select components */
   theme?: Theme;
+  /** Inner content of the application */
+  children: OnlyChild;
 }
 
-export class AppProvider extends React.Component<AppProviderProps, State> {
-  private stickyManager: StickyManager;
-  private scrollLockManager: ScrollLockManager;
-  private uniqueIdFactory: UniqueIdFactory;
+export function AppProvider({
+  apiKey,
+  shopOrigin,
+  forceRedirect,
+  i18n,
+  linkComponent,
+  theme = {logo: null},
+  children,
+}: AppProviderProps) {
+  const stickyManager = useRef(new StickyManager());
+  const scrollLockManager = useRef(new ScrollLockManager());
+  const uniqueIdFactory = useRef(new UniqueIdFactory(globalIdGeneratorFactory));
 
-  constructor(props: AppProviderProps) {
-    super(props);
-    this.stickyManager = new StickyManager();
-    this.scrollLockManager = new ScrollLockManager();
-    this.uniqueIdFactory = new UniqueIdFactory(globalIdGeneratorFactory);
+  const [appBridge, setAppBridge] = useState(
+    createAppBridge({shopOrigin, apiKey, forceRedirect}),
+  );
 
-    const {apiKey, shopOrigin, forceRedirect} = this.props;
-
-    // eslint-disable-next-line react/state-in-constructor
-    this.state = {
-      appBridge: createAppBridge({shopOrigin, apiKey, forceRedirect}),
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
+    console.log('useEffect 1 MOUNT');
     if (document != null) {
-      this.stickyManager.setContainer(document);
+      stickyManager.current.setContainer(document);
     }
-  }
+  }, []);
 
-  componentDidUpdate({
-    apiKey: prevApiKey,
-    shopOrigin: prevShopOrigin,
-    forceRedirect: prevForceRedirect,
-  }: AppProviderProps) {
-    const {apiKey, shopOrigin, forceRedirect} = this.props;
+  useEffect(() => {
+    console.log('useEffect 2 MOUNT');
+    setAppBridge(createAppBridge({shopOrigin, apiKey, forceRedirect}));
+  }, [apiKey, shopOrigin, forceRedirect]);
 
-    if (
-      apiKey === prevApiKey &&
-      shopOrigin === prevShopOrigin &&
-      forceRedirect === prevForceRedirect
-    ) {
-      return;
-    }
-
-    // eslint-disable-next-line react/no-did-update-set-state
-    this.setState({
-      appBridge: createAppBridge({shopOrigin, apiKey, forceRedirect}),
-    });
-  }
-
-  render() {
-    const {i18n, linkComponent, theme = {logo: null}, children} = this.props;
-    const {appBridge} = this.state;
-
-    return (
-      <I18nContext.Provider value={new I18n(i18n)}>
-        <ScrollLockManagerContext.Provider value={this.scrollLockManager}>
-          <StickyManagerContext.Provider value={this.stickyManager}>
-            <UniqueIdFactoryContext.Provider value={this.uniqueIdFactory}>
-              <AppBridgeContext.Provider value={appBridge}>
-                <LinkContext.Provider value={linkComponent}>
-                  <ThemeProvider theme={theme}>
-                    {React.Children.only(children)}
-                  </ThemeProvider>
-                </LinkContext.Provider>
-              </AppBridgeContext.Provider>
-            </UniqueIdFactoryContext.Provider>
-          </StickyManagerContext.Provider>
-        </ScrollLockManagerContext.Provider>
-      </I18nContext.Provider>
-    );
-  }
+  return (
+    <I18nContext.Provider value={new I18n(i18n)}>
+      <ScrollLockManagerContext.Provider value={scrollLockManager.current}>
+        <StickyManagerContext.Provider value={stickyManager.current}>
+          <UniqueIdFactoryContext.Provider value={uniqueIdFactory.current}>
+            <AppBridgeContext.Provider value={appBridge}>
+              <LinkContext.Provider value={linkComponent}>
+                <ThemeProvider theme={theme}>
+                  {React.Children.only(children)}
+                </ThemeProvider>
+              </LinkContext.Provider>
+            </AppBridgeContext.Provider>
+          </UniqueIdFactoryContext.Provider>
+        </StickyManagerContext.Provider>
+      </ScrollLockManagerContext.Provider>
+    </I18nContext.Provider>
+  );
 }
