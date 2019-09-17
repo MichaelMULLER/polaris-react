@@ -47,7 +47,7 @@ export function SkeletonPage({
     secondaryActions && styles['Header-hasSecondaryActions'],
   );
 
-  const titleMarkup = title !== null ? renderTitle(title) : null;
+  const titleMarkup = renderTitle(title);
 
   const primaryActionMarkup = primaryAction ? (
     <div className={styles.PrimaryAction}>
