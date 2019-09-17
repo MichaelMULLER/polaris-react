@@ -60,7 +60,7 @@ describe('<Page />', () => {
     it('gets passed into the <Header />', () => {
       const subtitle = 'Subtitle';
       const page = mountWithAppProvider(
-        <Page {...mockProps} subtitle={subtitle} />,
+        <Page {...mockProps} subtitle={subtitle} fullWidth />,
       );
       expect(page.find(Header).prop('subtitle')).toBe(subtitle);
     });
@@ -70,7 +70,7 @@ describe('<Page />', () => {
     it('gets passed into the <Header />', () => {
       const titleMetadata = <Badge>Sold</Badge>;
       const page = mountWithAppProvider(
-        <Page {...mockProps} titleMetadata={titleMetadata} />,
+        <Page {...mockProps} titleMetadata={titleMetadata} narrowWidth />,
       );
       expect(page.find(Header).prop('titleMetadata')).toBe(titleMetadata);
     });
