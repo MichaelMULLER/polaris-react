@@ -89,7 +89,7 @@ describe('<ContextualSaveBar />', () => {
       consoleErrorSpy.mockRestore();
     });
 
-    it('throws when no Frame or appBridge is provided', () => {
+    it('throws when no Frame', () => {
       function fn() {
         mount(<ContextualSaveBar {...props} />);
       }
