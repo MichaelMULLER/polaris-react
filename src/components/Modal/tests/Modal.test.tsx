@@ -1,6 +1,10 @@
 import React from 'react';
 import {animationFrame} from '@shopify/jest-dom-mocks';
-import {findByTestID, mountWithAppProvider} from 'test-utilities/legacy';
+import {
+  findByTestID,
+  mountWithAppProvider,
+  trigger,
+} from 'test-utilities/legacy';
 import {Badge, Spinner, Portal, Scrollable} from 'components';
 import {Footer, Dialog} from '../components';
 import Modal from '../Modal';
@@ -294,6 +298,44 @@ describe('<Modal>', () => {
       expect(() => {
         modal.unmount();
       }).not.toThrow();
+    });
+  });
+
+  describe('onIFrameLoad', () => {
+    it('calls the handler when the iframe loads', () => {
+      const spy = jest.fn();
+      const modal = mountWithAppProvider(
+        <Modal
+          src="Source"
+          iFrameName="Name"
+          onClose={jest.fn()}
+          open
+          onIFrameLoad={spy}
+        >
+          <Badge />
+        </Modal>,
+      );
+
+      const iframe = modal.find('iframe').first();
+      trigger(iframe, 'onLoad', {});
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Transitions', () => {
+    it('calls onTransitionEnd when the modal has entered', () => {
+      const spy = jest.fn();
+      const modal = mountWithAppProvider(
+        <Modal onClose={jest.fn()} open onTransitionEnd={spy}>
+          <Badge />
+        </Modal>,
+      );
+
+      const dialog = modal.find(Dialog).first();
+      trigger(dialog, 'onEntered');
+
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 });
